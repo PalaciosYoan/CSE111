@@ -1,4 +1,4 @@
-.mode "csv"
+.mode "tabs"
 .separator "|"
 .header off
 .import './data/customer.tbl' customer
