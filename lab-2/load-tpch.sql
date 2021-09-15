@@ -1,9 +1,9 @@
-<<<<<<< HEAD
-.mode "csv"
+
+.mode "tabs"
 .seperator ","
 .import "./data/customer.tbl"
 
-=======
+
 .mode "tabs"
 .separator "|"
 .header off
@@ -15,4 +15,4 @@
 .import './data/partsupp.tbl' partsupp
 .import './data/region.tbl' region
 .import './data/supplier.tbl' supplier
->>>>>>> c7a4f42e1e657b202b65359d9a1653d5b60139c5
+
