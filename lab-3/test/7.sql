@@ -1,4 +1,4 @@
-SELECT strftime('%m', lineitem.l_receiptdate) as "Month", 
+SELECT strftime('%Y-%m', lineitem.l_receiptdate) as "Month", 
 COUNT(lineitem.l_receiptdate)
 FROM customer
 INNER JOIN orders on orders.o_custkey = customer.c_custkey
