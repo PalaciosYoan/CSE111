@@ -46,29 +46,30 @@ FROM lineitem, part as p1,
             lineitem, 
             part
         WHERE 
+            c_nationkey = n_nationkey AND
             c_custkey = o_custkey AND
             o_orderkey = l_orderkey  AND
-            l_partkey = p_partkey AND
-            c_nationkey = n_nationkey AND 
             n_regionkey = r_regionkey AND
+            l_partkey = p_partkey AND
             r_name = 'AMERICA'
+        GROUP BY p_partkey
     ) as t2,
     (
-    SELECT p_partkey
-    FROM 
-        supplier, 
-        nation, 
-        region, 
-        lineitem, 
-        part
-    WHERE 
-        p_partkey = l_partkey AND
-        l_suppkey = s_suppkey AND
-        s_nationkey = n_nationkey  AND
-        n_regionkey = r_regionkey  AND
-        r_name = 'ASIA'
-    GROUP BY p_partkey
-    HAVING COUNT(*) = 3
+        SELECT p_partkey
+        FROM 
+            supplier, 
+            nation, 
+            region, 
+            lineitem, 
+            part
+        WHERE 
+            p_partkey = l_partkey AND
+            l_suppkey = s_suppkey AND
+            s_nationkey = n_nationkey  AND
+            n_regionkey = r_regionkey  AND
+            r_name = 'ASIA'
+        GROUP BY p_partkey
+        HAVING COUNT(p_partkey) = 3
     ) as t1
 WHERE 
     l_partkey = t1.p_partkey AND
