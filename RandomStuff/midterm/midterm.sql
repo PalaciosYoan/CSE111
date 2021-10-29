@@ -186,36 +186,106 @@ WHERE
 SELECT "8----------";
 .headers on
 --put your code here
+SELECT ship
+FROM 
+(
+    SELECT ship
+    FROM Outcomes
+    WHERE
+        result = 'damaged'
+)
+WHERE
+    ship IN (
+        SELECT ship
+        FROM Outcomes
+        WHERE
+            result != 'damaged'
+    )
 ;
 .headers off
 
 SELECT "9----------";
 .headers on
---put your code here
+--put your code here'
+SELECT t1.country, t2.bb, t1.bc
+FROM (
+            SELECT country, count(type) as bc
+            FROM Ships ship, Classes cls
+            WHERE
+                ship.class = cls.class AND
+                cls.type = 'bc'
+            GROUP BY country
+                ) t1,
+    (
+                SELECT country, count(type) as bb
+                FROM Ships ship, Classes cls
+                WHERE
+                    ship.class = cls.class AND
+                    cls.type = 'bb'
+                GROUP BY country
+            ) t2
+WHERE
+    t1.country = t2.country 
+GROUP BY t1.country
 ;
 .headers off
 
 SELECT "10---------";
 .headers on
 --put your code here
+UPDATE Classes
+SET numGuns = numGuns *2
+WHERE
+    class IN 
+        (
+            SELECT DISTINCT Classes.class
+            FROM Classes, Ships
+            WHERE Classes.class = Ships.class and
+            Ships.launched >= 1940
+    )
 ;
 .headers off
 
 SELECT "11---------";
 .headers on
 --put your code here
+SELECT class
+FROM (
+    SELECT cls.class as class, COUNT(ship.name) as shipCount
+    FROM Classes cls, Ships ship
+    WHERE 
+        cls.class = ship.class
+    GROUP BY cls.class)
+GROUP BY  class
+HAVING shipCount = 2
 ;
 .headers off
 
 SELECT "12---------";
 .headers on
 --put your code here
+SELECT class
+FROM Ships
+WHERE name NOT IN (
+                    SELECT ship 
+                    FROM Outcomes 
+                    WHERE result = 'sunk'
+                    )
+GROUP BY class
+HAVING COUNT(*) = 2
 ;
 .headers off
 
 SELECT "13---------";
 .headers on
 --put your code here
+DELETE  FROM Ships
+WHERE
+    name IN (
+        SELECT ship
+        FROM Outcomes
+        WHERE result = 'sunk'
+    )
 ;
 .headers off
 
