@@ -73,33 +73,114 @@ INSERT INTO Battles (name, date) VALUES ("Denmark Strait", "1941-05-24 00:00:00"
 SELECT "3----------";
 .headers on
 --put your code here
-
-
+SELECT cls.country, COUNT(shp.name) as numShips
+FROM Classes cls, Ships shp
+WHERE 
+    cls.class = shp.class AND
+    shp.launched BETWEEN 1930 AND 1940
+GROUP BY cls.country
 ;
 .headers off
 
 SELECT "4----------";
 .headers on
 --put your code here
+INSERT INTO Outcomes(ship, battle, result)
+SELECT name, 'Denmark Strait' as battle, 'damaged' as result
+FROM 
+    (
+        SELECT ship.name, 'Denmark Strait' as battle
+        FROM Ships ship
+        WHERE launched <= 1920
+        EXCEPT
+        SELECT ship, battle
+        FROM Outcomes
+    )
 ;
+
 .headers off
 
 SELECT "5----------";
 .headers on
 --put your code here
+SELECT country, COUNT(result) as numDamage
+FROM
+    (
+        SELECT country, result
+        FROM Classes cls, Ships ship, Outcomes otcme
+        WHERE
+            cls.class = ship.class AND
+            ship.name = otcme.ship AND
+            otcme.result = 'damaged'
+    )
+GROUP BY country
 ;
 .headers off
 
 SELECT "6----------";
 .headers on
 --put your code here
+SELECT country
+FROM 
+    (
+        SELECT country, COUNT(result) as numDamage
+        FROM
+            (
+                SELECT country, result
+                FROM Classes cls, Ships ship, Outcomes otcme
+                WHERE
+                    cls.class = ship.class AND
+                    ship.name = otcme.ship AND
+                    otcme.result = 'damaged'
+            )
+        GROUP BY country
+    )
+WHERE cast(numDamage as REAL) = (
+    SELECT MIN(CAST(numDamage as real))
+    FROM 
+        (
+            SELECT country, COUNT(result) as numDamage
+            FROM
+                (
+                    SELECT country, result
+                    FROM Classes cls, Ships ship, Outcomes otcme
+                    WHERE
+                        cls.class = ship.class AND
+                        ship.name = otcme.ship AND
+                        otcme.result = 'damaged'
+                )
+            GROUP BY country
+        ) t1
+)
 ;
 .headers off
 
 SELECT "7----------";
 .headers on
 --put your code here
-;
+DELETE FROM Outcomes
+WHERE
+    ship IN (
+        SELECT ship
+        FROM Classes cls, Ships ship,
+            (
+                SELECT ship, battle, result
+                FROM Outcomes otcme
+                WHERE otcme.battle = 'Denmark Strait'
+            ) t1
+        WHERE
+            cls.class =ship.class AND
+            ship.name = t1.ship AND
+            cls.country = 'Japan'
+    ) AND
+    battle IN 
+            (
+                SELECT battle
+                FROM Outcomes otcme
+                WHERE otcme.battle = 'Denmark Strait'
+            )
+    ;
+
 .headers off
 
 SELECT "8----------";
