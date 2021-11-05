@@ -1,41 +1,30 @@
--- SQLite
--- SELECT *
--- FROM
---     (
---         SELECT n_name, COUNT(c_name) as num_cust
---         FROM supplier, nation, customer, lineitem, orders
---         WHERE 
---             s_suppkey = l_suppkey AND
---             l_orderkey = o_orderkey AND
---             o_custkey = c_custkey AND
---             c_nationkey = n_nationkey AND
---             s_name = 'Supplier#000000041'
---         GROUP BY n_name
---         ORDER BY num_cust DESC
---     )
--- LIMIT 2;
+-- Q5 determines the total capacity of the warehouses belonging 
+-- to suppliers from a given nation in every
+-- region. The suppliers’ nation is a parameter stored 
+-- in the file input/5.in. If there are no warehouses
+-- in a region, then value 0 is printed for that region. 
+-- Q5 prints the region and the capacity sorted
+-- alphabetically by region. (3 points)
+-- UNITED STATES
 
--- SELECT n_name, SUM(c_name) as total_size
---     FROM supplier, nation, customer, lineitem, orders, part
---     WHERE 
---         s_suppkey = l_suppkey AND
---         l_orderkey = o_orderkey AND
---         o_custkey = c_custkey AND
---         c_nationkey = n_nationkey
---     GROUP BY n_name
---     ORDER BY num_cust DESC
 
---In order to determine the capacity of a
--- warehouse, you have to compute the total size of the parts (p size) supplied by the supplier to the
--- customers in a nation.
 
-SELECT n_name, TOTAL(p_size)
-FROM part, nation, customer, orders, lineitem, supplier
-WHERE
-    s_suppkey = l_suppkey AND
-    p_partkey = l_partkey AND
-    l_orderkey = o_orderkey AND
-    o_custkey = c_custkey AND
-    c_nationkey = n_nationkey AND
-    s_name = 'Supplier#000000001'
-GROUP BY n_name
+SELECT r_name as region, 
+    CASE 
+        WHEN SUM(t1.w_capacity)>0 THEN SUM(t1.w_capacity)/2
+        ELSE 0
+    END as capacity
+FROM region, warehouse w1, nation as t2,
+    (
+        SELECT s_name, n_name, w_capacity, n_regionkey, n_nationkey, w_warehousekey
+        FROM supplier, nation, warehouse
+        WHERE
+            s_nationkey = n_nationkey AND
+            s_suppkey = w_suppkey AND
+            n_name = 'UNITED STATES'
+    ) t1
+WHERE 
+    w_nationkey = t2.n_nationkey AND
+    t2.n_regionkey = r_regionkey AND
+    t1.w_warehousekey = w1.w_warehousekey
+GROUP BY r_name;
