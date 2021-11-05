@@ -234,19 +234,18 @@ def Q5(_conn):
         lines = f.read()
         lines = lines.replace('\n', '')
     query = """
-        SELECT r_name as region, 
-            CASE 
-                WHEN SUM(t1.w_capacity)>0 THEN SUM(t1.w_capacity)/2
-                ELSE 0
-            END as capacity
+        SELECT r_name as region, IFNULL(SUM(t1.w_capacity)/2, 0) capacity
         FROM region, warehouse w1, nation as t2,
             (
-                SELECT s_name, n_name, w_capacity, n_regionkey, n_nationkey, w_warehousekey
+                SELECT w_warehousekey,
+                    CASE
+                        WHEN n_name = 'UNITED STATES' THEN w_capacity
+                        ELSE 0
+                    END w_capacity
                 FROM supplier, nation, warehouse
                 WHERE
                     s_nationkey = n_nationkey AND
-                    s_suppkey = w_suppkey AND
-                    n_name = 'UNITED STATES'
+                    s_suppkey = w_suppkey 
             ) t1
         WHERE 
             w_nationkey = t2.n_nationkey AND
