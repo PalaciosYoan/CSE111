@@ -238,10 +238,11 @@ SET numGuns = numGuns *2
 WHERE
     class IN 
         (
-            SELECT DISTINCT Classes.class
-            FROM Classes, Ships
-            WHERE Classes.class = Ships.class and
-            Ships.launched >= 1940
+            SELECT DISTINCT cls.class
+            FROM Classes cls, Ships
+            WHERE 
+                cls.class = Ships.class AND
+                Ships.launched >= 1940
     )
 ;
 .headers off
@@ -255,7 +256,8 @@ FROM (
     FROM Classes cls, Ships ship
     WHERE 
         cls.class = ship.class
-    GROUP BY cls.class)
+    GROUP BY cls.class
+    )
 GROUP BY  class
 HAVING shipCount = 2
 ;
@@ -266,13 +268,15 @@ SELECT "12---------";
 --put your code here
 SELECT class
 FROM Ships
-WHERE name NOT IN (
+WHERE 
+    name NOT IN (
                     SELECT ship 
                     FROM Outcomes 
-                    WHERE result = 'sunk'
+                    WHERE 
+                        result = 'sunk'
                     )
 GROUP BY class
-HAVING COUNT(*) = 2
+HAVING COUNT(*) == 2
 ;
 .headers off
 
@@ -292,23 +296,89 @@ WHERE
 SELECT "14---------";
 .headers on
 --put your code here
+SELECT country, SUM(numGuns)
+FROM Classes cls, Ships ship
+WHERE 
+    cls.class = ship.class
+GROUP BY country
 ;
 .headers off
 
 SELECT "15---------";
 .headers on
 --put your code here
+SELECT cls.country, TOTAL(cls.numGuns) - t1.numCount as newTotalNumGuns
+FROM Classes cls, Ships ship,
+    (
+        SELECT cls.country as country, COUNT(result) as numCount
+        FROM Classes cls
+        LEFT JOIN Ships on cls.class = Ships.class
+        LEFT JOIN Outcomes on Ships.name = Outcomes.ship AND Outcomes.result = 'damaged'
+        GROUP BY cls.country
+    ) as t1
+
+WHERE 
+    cls.class = ship.class AND
+    cls.country = t1.country
+GROUP BY cls.country
 ;
 .headers off
 
 SELECT "16---------";
 .headers on
 --put your code here
+INSERT INTO Ships(name, class, launched)
+SELECT t1.name, t1.class, min(ship.launched)
+FROM Ships ship,
+    (
+        SELECT Classes.class as name, Classes.class AS class
+        FROM Classes
+        LEFT JOIN Ships ON Classes.class=Ships.class
+        WHERE
+            Ships.class is Null
+    ) t1
+
+
 ;
+
 .headers off
 
 SELECT "17---------";
 .headers on
 --put your code here
+SELECT t1.country,
+    t1.cnt as '1911-1920',
+    t2.cnt as '1921-1930',
+    t3.cnt as '1931-1940',
+    t4.cnt as '1941-1950'
+FROM
+    (
+        SELECT country, count(launched) as cnt
+        FROM Classes cls
+        LEFT JOIN Ships ON cls.class = Ships.class AND launched >= 1911 AND launched <= 1920
+        GROUP BY country
+    )t1,
+    (
+        SELECT country, count(launched) as cnt
+        FROM Classes cls
+        LEFT JOIN Ships ON cls.class = Ships.class AND launched >= 1921 AND launched <= 1930
+        GROUP BY country
+    )t2,
+    (
+        SELECT country, count(launched) as cnt
+        FROM Classes cls
+        LEFT JOIN Ships ON cls.class = Ships.class AND launched >= 1931 AND launched <= 1940
+        GROUP BY country
+    )t3,
+    (
+        SELECT country, count(launched) as cnt
+        FROM Classes cls
+        LEFT JOIN Ships ON cls.class = Ships.class AND launched >= 1941 AND launched <= 1950
+        GROUP BY country
+    )t4
+WHERE
+    t1.country = t2.country AND
+    t2.country = t3.country AND
+    t3.country = t4.country
 ;
 .headers off
