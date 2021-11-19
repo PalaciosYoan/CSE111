@@ -1,0 +1,4 @@
+QUERY PLAN
+|--SCAN orders USING COVERING INDEX orders_idx_o_custkey_o_orderkey
+`--SEARCH lineitem USING INDEX lineitem_idx_l_orderkey_l_suppkey (l_orderkey=?)
+975

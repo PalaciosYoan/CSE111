@@ -1,9 +1,8 @@
 
 import sqlite3
 from sqlite3 import Error
-import pandas as pd
 from tabulate import tabulate
-
+import pandas as pd
 '''
     sql_query = 'SELECT * FROM x where name = ?'
     todo a query we need too do cur = _conn.cursor() => cur.execute(sql_query, [optional arguements])
@@ -129,6 +128,9 @@ def populateTable(_conn):
                 sId.append(count)
             
             count += 1
+        index = []
+        for i in range(1, len(nation_id)+1):
+            index.append(i)
         df['wId'] = index
         df['wName'] = l
         df['wCap'] = cap_size
@@ -147,12 +149,16 @@ def Q1(_conn):
     print("Q1")
 
     query = 'SELECT * FROM warehouse;'
-    df = pd.read_sql_query(query, _conn)
-    df = df.rename(columns={'w_warehousekey':'wId', 'w_name':'wName', 'w_capacity':'wCap', 'w_suppkey':'sId', 'w_nationkey':'nId'})
-    # df = df.style.set_properties(**{'text-align': 'left'})
-    #df = tabulate(df, showindex=False, headers=df.columns)
-    with open('./output/1.out', 'w') as f:
-        f.write(df.to_string(index=False, justify='left', col_space=10))
+    try:
+        df = pd.read_sql_query(query, _conn)
+        df = df.rename(columns={'w_warehousekey':'wId', 'w_name':'wName', 'w_capacity':'wCap', 'w_suppkey':'sId', 'w_nationkey':'nId'})
+        # df = df.style.set_properties(**{'text-align': 'left'})
+        #df = tabulate(df, showindex=False, headers=df.columns)
+        with open('./output/1.out', 'w') as f:
+            f.write(df.to_string(index=False, col_space=20))
+    except Error as e:
+        _conn.rollback()
+        print(e)
     print("++++++++++++++++++++++++++++++++++")
 
 
@@ -164,10 +170,23 @@ def Q2(_conn):
                 WHERE 
                     w_nationkey = n_nationkey
                 GROUP BY n_name
-                ORDER BY numW DESC;"""
-    df = pd.read_sql_query(query, _conn)
-    with open('./output/2.out', 'w') as f:
-        f.write(df.to_string(index=False, col_space=20))
+                ORDER BY numW DESC, totCap DESC;"""
+    try:
+        cur = _conn.cursor()
+        cur.execute(query)
+        header = '{:<40} {:>10} {:>10}\n'.format(
+                "nation", "numW", "totCap")
+        
+        with open('./output/2.out', 'w') as f:
+            f.write(header)
+            rows = cur.fetchall()
+            for row in rows:
+                data = '{:<40} {:>10} {:>10}\n'.format(
+                    row[0], row[1], row[2])
+                f.write(data)
+    except Error as e:
+        _conn.rollback()
+        print(e)
     print("++++++++++++++++++++++++++++++++++")
 
 
@@ -181,26 +200,37 @@ def Q3(_conn):
             temp = nations_temp[i].replace('\n', '')
             if len(temp) > 0:
                 nations.append(temp)
-    df = pd.DataFrame(columns=['supplier', 'nation', 'warehouse'])
-    for n in nations:        
-        nationkeys = []
-        nationkey = """SELECT n_nationkey
-                        FROM nation
-                        WHERE n_name = '{}';""".format(n)
-        for r in _conn.execute(nationkey):
-            nationkeys.append(r[0])
-        for key in nationkeys:
-            query = """
-                    SELECT s_name as supplier, n_name as nation, w_name as warehouse
-                    FROM warehouse, nation, supplier
-                    WHERE 
-                        s_nationkey = n_nationkey AND
-                        s_suppkey = w_suppkey AND
-                        w_nationkey = {}
-                    GROUP BY s_name;""".format(key)
-            df = df.append(pd.read_sql_query(query, _conn))
-    with open('./output/3.out', 'w') as f:
-        f.write(df.to_string(index=False, col_space=20))
+    try:
+        f = open('./output/3.out', 'w')
+        header = '{:<20} {:<20} {:<40}\n'.format(
+                'supplier', 'nation', 'warehouse')
+        f.write(header)
+        for n in nations:        
+            nationkeys = []
+            nationkey = """SELECT n_nationkey
+                            FROM nation
+                            WHERE n_name = '{}';""".format(n)
+            for r in _conn.execute(nationkey):
+                nationkeys.append(r[0])
+            for key in nationkeys:
+                query = """
+                        SELECT s_name as supplier, n_name as nation, w_name as warehouse
+                        FROM warehouse, nation, supplier
+                        WHERE 
+                            s_nationkey = n_nationkey AND
+                            s_suppkey = w_suppkey AND
+                            w_nationkey = {}
+                        GROUP BY s_name;""".format(key)
+                
+                cursor = _conn.cursor()
+                cursor.execute(query)
+                for row in cursor.fetchall():
+                    data = '{:<20} {:<20} {:<40}\n'.format(
+                        row[0], row[1], row[2])
+                    f.write(data)
+    except Error as e:
+        _conn.rollback()
+        print(e)
     print("++++++++++++++++++++++++++++++++++")
 
 
@@ -221,41 +251,67 @@ def Q4(_conn):
                 GROUP BY w_capacity
                 HAVING w_capacity > {}
                 ORDER BY w_capacity DESC;""".format(d['region'], d['capacity'])
-    df = pd.read_sql_query(query, _conn)
-    with open('./output/4.out', 'w') as f:
-        f.write(df.to_string(index=False, col_space=20))
+    header = '{:<40} {:>10}\n'.format(
+            'warehouse', 'capacity',)
+    try:
+        with open('./output/4.out', 'w') as f:
+            f.write(header)
+            cursor = _conn.cursor()
+            cursor.execute(query)
+            for row in cursor.fetchall():
+                data = '{:<40} {:<10}\n'.format(
+                    row[0], row[1])
+                f.write(data)
+    except Error as e:
+        _conn.rollback()
+        print(e)
     print("++++++++++++++++++++++++++++++++++")
 
 
 def Q5(_conn):
     print("++++++++++++++++++++++++++++++++++")
     print("Q5")
-    with open('./input/4.in', 'r') as f:
-        lines = f.read()
-        lines = lines.replace('\n', '')
+    l = None
+    with open('./input/5.in', 'r') as f:
+        l = f.read().splitlines()
+
     query = """
-        SELECT r_name as region, IFNULL(SUM(t1.w_capacity)/2, 0) capacity
-        FROM region, warehouse w1, nation as t2,
+        WITH t1 AS
             (
-                SELECT w_warehousekey,
-                    CASE
-                        WHEN n_name = 'UNITED STATES' THEN w_capacity
-                        ELSE 0
-                    END w_capacity
-                FROM supplier, nation, warehouse
-                WHERE
-                    s_nationkey = n_nationkey AND
-                    s_suppkey = w_suppkey 
-            ) t1
-        WHERE 
-            w_nationkey = t2.n_nationkey AND
-            t2.n_regionkey = r_regionkey AND
-            t1.w_warehousekey = w1.w_warehousekey
-        GROUP BY r_name;
-            """
-    df = pd.read_sql_query(query, _conn)
-    with open('./output/5.out', 'w') as f:
-        f.write(df.to_string(index=False, col_space=20))
+                SELECT region.r_name as name, SUM(w_capacity) as sumCap
+                FROM region, nation as n1, warehouse, nation as n2, supplier
+                WHERE 
+                    w_nationkey = n1.n_nationkey AND
+                    s_suppkey = w_suppkey AND
+                    s_nationkey = n2.n_nationkey AND
+                    n1.n_regionkey = region.r_regionkey AND
+                    n2.n_name = '{}'
+                GROUP BY region.r_name
+            )
+        SELECT region.r_name, 
+            CASE 
+                WHEN t1.sumCap > 0 THEN t1.sumCap 
+                ELSE 0 
+            END
+        FROM region
+        LEFT JOIN t1 ON r_name = t1.name
+        GROUP BY region.r_name
+        ORDER BY region.r_name ASC;
+            """.format(l[0])
+    header = '{:<20} {:>20}\n'.format(
+            'region', 'capacity',)
+    try:
+        with open('./output/5.out', 'w') as f:
+            f.write(header)
+            cursor = _conn.cursor()
+            cursor.execute(query)
+            for row in cursor.fetchall():
+                data = '{:<20} {:>20}\n'.format(
+                    row[0], row[1])
+                f.write(data)
+    except Error as e:
+        _conn.rollback()
+        print(e)
     print("++++++++++++++++++++++++++++++++++")
 
 

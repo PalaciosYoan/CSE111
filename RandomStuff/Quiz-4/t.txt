@@ -1,0 +1,163 @@
+++++++++++++++++++++++++++++++++++
+Open database:  data.sqlite
+success
+++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++
+Create PriceRange
+++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++
+Print PriceRange
+maker      product                          minPrice             maxPrice
+A          laptop                               1150                 2500
+A          pc                                    478                 2114
+A          printer                               150                  520
+B          laptop                               1429                 1429
+B          pc                                    630                 1049
+C          pc                                    510                  510
+D          pc                                    650                  770
+D          printer                               120                  120
+E          laptop                                549                 3673
+E          pc                                    529                  959
+E          printer                                99                  899
+F          laptop                                680                  900
+G          laptop                               2300                 2300
+H          printer                               100                  200
+++++++++++++++++++++++++++++++++++
+I pc F 1101 3.2 8192 1024 948
+++++++++++++++++++++++++++++++++++
+Insert PC (F, 1101, 3.2, 8192, 1024, 948)
+++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++
+Print PriceRange
+maker      product                          minPrice             maxPrice
+A          laptop                               1150                 2500
+A          pc                                    478                 2114
+A          printer                               150                  520
+B          laptop                               1429                 1429
+B          pc                                    630                 1049
+C          pc                                    510                  510
+D          pc                                    650                  770
+D          printer                               120                  120
+E          laptop                                549                 3673
+E          pc                                    529                  959
+E          printer                                99                  899
+F          laptop                                680                  900
+F          pc                                    948                  948
+G          laptop                               2300                 2300
+H          printer                               100                  200
+++++++++++++++++++++++++++++++++++
+U printer 3004 122
+++++++++++++++++++++++++++++++++++
+Update Printer (3004, 122)
+++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++
+Print PriceRange
+maker      product                          minPrice             maxPrice
+A          laptop                               1150                 2500
+A          pc                                    478                 2114
+A          printer                               150                  520
+B          laptop                               1429                 1429
+B          pc                                    630                 1049
+C          pc                                    510                  510
+D          pc                                    650                  770
+D          printer                               120                  122
+E          laptop                                549                 3673
+E          pc                                    529                  959
+E          printer                                99                  899
+F          laptop                                680                  900
+F          pc                                    948                  948
+G          laptop                               2300                 2300
+H          printer                               100                  200
+++++++++++++++++++++++++++++++++++
+D laptop 2007
+++++++++++++++++++++++++++++++++++
+Delete Laptop (2007)
+++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++
+Print PriceRange
+maker      product                          minPrice             maxPrice
+A          laptop                               1150                 2500
+A          pc                                    478                 2114
+A          printer                               150                  520
+B          pc                                    630                 1049
+C          pc                                    510                  510
+D          pc                                    650                  770
+D          printer                               120                  122
+E          laptop                                549                 3673
+E          pc                                    529                  959
+E          printer                                99                  899
+F          laptop                                680                  900
+F          pc                                    948                  948
+G          laptop                               2300                 2300
+H          printer                               100                  200
+++++++++++++++++++++++++++++++++++
+D laptop 2009
+++++++++++++++++++++++++++++++++++
+Delete Laptop (2009)
+++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++
+Print PriceRange
+maker      product                          minPrice             maxPrice
+A          laptop                               1150                 2500
+A          pc                                    478                 2114
+A          printer                               150                  520
+B          pc                                    630                 1049
+C          pc                                    510                  510
+D          pc                                    650                  770
+D          printer                               120                  122
+E          laptop                                549                 3673
+E          pc                                    529                  959
+E          printer                                99                  899
+F          laptop                                900                  900
+F          pc                                    948                  948
+G          laptop                               2300                 2300
+H          printer                               100                  200
+++++++++++++++++++++++++++++++++++
+U printer 3006 98
+++++++++++++++++++++++++++++++++++
+Update Printer (3006, 98)
+++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++
+Print PriceRange
+maker      product                          minPrice             maxPrice
+A          laptop                               1150                 2500
+A          pc                                    478                 2114
+A          printer                               150                  520
+B          pc                                    630                 1049
+C          pc                                    510                  510
+D          pc                                    650                  770
+D          printer                               120                  122
+E          laptop                                549                 3673
+E          pc                                    529                  959
+E          printer                                99                  899
+F          laptop                                900                  900
+F          pc                                    948                  948
+G          laptop                               2300                 2300
+H          printer                                98                  200
+++++++++++++++++++++++++++++++++++
+I pc A 1102 2.8 16384 2048 2649
+++++++++++++++++++++++++++++++++++
+Insert PC (A, 1102, 2.8, 16384, 2048, 2649)
+++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++
+Print PriceRange
+maker      product                          minPrice             maxPrice
+A          laptop                               1150                 2500
+A          pc                                    478                 2649
+A          printer                               150                  520
+B          pc                                    630                 1049
+C          pc                                    510                  510
+D          pc                                    650                  770
+D          printer                               120                  122
+E          laptop                                549                 3673
+E          pc                                    529                  959
+E          printer                                99                  899
+F          laptop                                900                  900
+F          pc                                    948                  948
+G          laptop                               2300                 2300
+H          printer                                98                  200
+++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++
+Close database:  data.sqlite
+success
+++++++++++++++++++++++++++++++++++
