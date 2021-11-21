@@ -1,14 +1,11 @@
 -- SQLite
 
 --1
-select c_custkey, c_name, c_address, c_phone, c_acctbal, c_mktsegment, c_comment, n_name, r_name, sum(o_totalprice)
+select c_custkey, c_name, c_address, c_phone, c_acctbal, c_mktsegment, c_comment, n_name, r_name
 from orders, customer, nation, region
 where o_custkey = c_custkey and
 	n_nationkey = c_nationkey and
-    n_regionkey = r_regionkey AND
-	n_name = 'FRANCE' AND
-	o_orderdate like '1995-__-__'
-group by c_name;
+    n_regionkey = r_regionkey
 
 --2
 select r_name, count(*)
@@ -22,6 +19,14 @@ select n_name, count(*)
 from orders, nation, region, customer
 where c_custkey = o_custkey
     and c_nationkey = n_nationkey
+    and n_regionkey = r_regionkey
+    and r_name='AMERICA'
+group by n_name;
+
+select n_name, count(*)
+from nation, region, customer
+where 
+    c_nationkey = n_nationkey
     and n_regionkey = r_regionkey
     and r_name='AMERICA'
 group by n_name;
