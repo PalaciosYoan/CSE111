@@ -147,19 +147,22 @@ select s_region as suppRegion, s_region as custRegion, max(o_totalprice)
 from lineitem, V2, orders, V1
 where l_suppkey = s_suppkey
     and l_orderkey = o_orderkey
-    and o_custkey = c_custkey
+
 group by s_region, c_region;
 
 --15
-select *
-from lineitem, supplier, orders, customer
+select count(distinct l_orderkey)
+from lineitem, V152, orders, V151
 where l_suppkey = s_suppkey
     and l_orderkey = o_orderkey
-    and o_custkey = c_custkey
-    and c_acctbal > 0
-    ;
+    and o_custkey = c_custkey;
 
 select c_custkey, c_name, c_nationkey, c_acctbal
 from customer
 where 
     c_acctbal > 0;
+
+select s_suppkey, s_name, s_nationkey, s_acctbal
+from supplier
+WHERE
+    s_acctbal < 0;

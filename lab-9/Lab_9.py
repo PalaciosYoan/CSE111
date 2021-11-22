@@ -137,10 +137,10 @@ def create_View152(_conn):
     try:
         q = """
             create view IF NOT EXISTS V152(s_suppkey, s_name, s_nationkey,s_acctbal)   as
-            select c_custkey, c_name, c_nationkey, c_acctbal
-            from customer
-            where 
-                c_acctbal > 0;
+            select s_suppkey, s_name, s_nationkey, s_acctbal
+            from supplier
+            WHERE
+                s_acctbal < 0;
             """
         _conn.execute(q)
         _conn.commit()
@@ -168,6 +168,7 @@ def Q1(_conn):
         with open('./output/1.out', 'w+') as f:
             for row in rows:
                 l = '{:<10}|{}\n'.format(row[0], round(row[1], 2))
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -190,6 +191,7 @@ def Q2(_conn):
         with open('./output/2.out', 'w+') as f:
             for row in rows:
                 l = '{}|{}\n'.format(row[0], row[1])
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -215,6 +217,7 @@ def Q3(_conn):
         with open('./output/3.out', 'w+') as f:
             for row in rows:
                 l = '{}|{}\n'.format(row[0], row[1])
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -241,6 +244,7 @@ def Q4(_conn):
         with open('./output/4.out', 'w+') as f:
             for row in rows:
                 l = '{}|{}\n'.format(row[0], row[1])
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -266,6 +270,7 @@ def Q5(_conn):
         with open('./output/5.out', 'w+') as f:
             for row in rows:
                 l = '{}|{}\n'.format(row[0], row[1])
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -294,6 +299,7 @@ def Q6(_conn):
         with open('./output/6.out', 'w+') as f:
             for row in rows:
                 l = '{}|{}|{}\n'.format(row[0], row[1], row[2])
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -318,6 +324,7 @@ def Q7(_conn):
         with open('./output/7.out', 'w+') as f:
             for row in rows:
                 l = '{}|{}|{}\n'.format(row[0], row[1], row[2])
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -345,6 +352,7 @@ def Q8(_conn):
         with open('./output/8.out', 'w+') as f:
             for row in rows:
                 l = '{}|{}\n'.format(row[0], row[1])
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -369,6 +377,7 @@ def Q9(_conn):
         with open('./output/9.out', 'w+') as f:
             for row in rows:
                 l = '{}\n'.format(row[0])
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -394,6 +403,7 @@ def Q10(_conn):
         with open('./output/10.out', 'w+') as f:
             for row in rows:
                 l = '{}|{}|{}\n'.format(row[0], row[1],row[2])
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -421,6 +431,7 @@ def Q11(_conn):
         with open('./output/11.out', 'w+') as f:
             for row in rows:
                 l = '{}|{}|{}\n'.format(row[0], row[1], round(row[2], 2))
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -444,6 +455,7 @@ def Q12(_conn):
         with open('./output/12.out', 'w+') as f:
             for row in rows:
                 l = '{}|{}\n'.format(row[0], round(row[1], 2))
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -469,7 +481,8 @@ def Q13(_conn):
         rows = cur.fetchall()
         with open('./output/13.out', 'w+') as f:
             for row in rows:
-                l = '{}|{}\n'.format(row[0])
+                l = '{}\n'.format(row[0])
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -482,7 +495,7 @@ def Q14(_conn):
     print("Q14")
     try:
         q ="""
-            select s_region as suppRegion, s_region as custRegion, max(o_totalprice)
+            select s_region as suppRegion, c_region as custRegion, max(o_totalprice)
             from lineitem, V2, orders, V1
             where l_suppkey = s_suppkey
                 and l_orderkey = o_orderkey
@@ -495,6 +508,7 @@ def Q14(_conn):
         with open('./output/14.out', 'w+') as f:
             for row in rows:
                 l = '{}|{}|{}\n'.format(row[0],row[1], round(row[2], 2))
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
@@ -507,7 +521,11 @@ def Q15(_conn):
     print("Q15")
     try:
         q ="""
-            
+            select count(distinct l_orderkey)
+            from lineitem, V152, orders, V151
+            where l_suppkey = s_suppkey
+                and l_orderkey = o_orderkey
+                and o_custkey = c_custkey;
         """
         cur = _conn.cursor()
         cur.execute(q)
@@ -515,6 +533,7 @@ def Q15(_conn):
         with open('./output/15.out', 'w+') as f:
             for row in rows:
                 l = '{}\n'.format(row[0])
+                print(l, end="")
                 f.write(l)
     except Error as e:
         _conn.rollback()
